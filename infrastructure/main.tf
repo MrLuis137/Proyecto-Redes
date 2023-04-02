@@ -367,3 +367,123 @@ resource "azurerm_virtual_machine" "vm3" {
  }
 
 }
+
+// ______________________________________________________________________________
+//                                Firewall
+//_______________________________________________________________________________
+
+resource "azurerm_firewall_network_rule_collection" "firewall" {
+  name                = "firewall"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  priority            = 100
+  
+
+  //in rules
+  rule {
+    name                     = "SSH_IN_TCP_22"
+    description              = "Allow inbound SSH traffic in port 22"
+    source_addresses         = ["*"]
+    destination_ports        = ["22"]
+    destination_addresses    = ["*"]
+    protocol                 = "TCP"
+    access                   = "Allow"
+    direction                = "Inbound"
+    priority                 = 100
+  }
+  
+  rule {
+    name                     = "HTTP_IN_TCP_80"
+    description              = "Allow inbound HTTP traffic in port 80"
+    source_addresses         = ["*"]
+    destination_ports        = ["80"]
+    destination_addresses    = ["*"]
+    protocol                 = "TCP"
+    access                   = "Allow"
+    direction                = "Inbound"
+    priority                 = 101
+  }
+  
+  rule {
+    name                     = "HTTPS_IN_TCP_443"
+    description              = "Allow inbound HTTPS traffic in port 443"
+    source_addresses         = ["*"]
+    destination_ports        = ["443"]
+    destination_addresses    = ["*"]
+    protocol                 = "TCP"
+    access                   = "Allow"
+    direction                = "Inbound"
+    priority                 = 102
+  }
+
+  //out rules
+
+  rule {
+    name                     = "SSH_OUT_TCP_22"
+    description              = "Allow outbound SSH traffic in port 22"
+    source_addresses         = ["*"]
+    destination_ports        = ["22"]
+    destination_addresses    = ["*"]
+    protocol                 = "TCP"
+    access                   = "Allow"
+    direction                = "Outbound"
+    priority                 = 103
+  }
+  
+
+  rule {
+    name                     = "HTTP_OUT_TCP_80"
+    description              = "Allow outbound HTTP trafficin port 80"
+    source_addresses         = ["*"]
+    destination_ports        = ["80"]
+    destination_addresses    = ["*"]
+    protocol                 = "TCP"
+    access                   = "Allow"
+    direction                = "Outbound"
+    priority                 = 104
+  }
+  
+  rule {
+    name                     = "HTTPS_OUT_TCP_443"
+    description              = "Allow outbound HTTPS traffic in port 443"
+    source_addresses         = ["*"]
+    destination_ports        = ["443"]
+    destination_addresses    = ["*"]
+    protocol                 = "TCP"
+    access                   = "Allow"
+    direction                = "Outbound"
+    priority                 = 105
+  }
+  
+  rule {
+    name                     = "Allow_udp_out"
+    description              = "Allow outbound UDP traffic"
+    source_addresses         = ["*"]
+    destination_ports        = ["*"]
+    destination_addresses    = ["*"]
+    protocol                 = "UDP"
+    access                   = "Allow"
+    direction                = "Outbound"
+    priority                 = 106
+  }
+}
+
+
+//Se asocia el firewall con las redes
+
+resource "azurerm_subnet_network_security_group_association" "subnet1-firewall" {
+  subnet_id                 = azurerm_subnet.subred1.id
+  network_security_group_id = azurerm_firewall_network_rule_collection.firewall.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "subnet2-firewall" {
+  subnet_id                 = azurerm_subnet.subred1.id
+  network_security_group_id = azurerm_firewall_network_rule_collection.firewall.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "subnet3-firewall" {
+  subnet_id                 = azurerm_subnet.subred1.id
+  network_security_group_id = azurerm_firewall_network_rule_collection.firewall.id
+}
+
+
