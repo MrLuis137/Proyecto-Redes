@@ -200,8 +200,13 @@ resource "azurerm_subnet_route_table_association" "subred1" {
   route_table_id = azurerm_route_table.subred1.id
 }
 
+
+//_____________________________________________________________________________________
+//VM1
+//_____________________________________________________________________________________
+
 resource "azurerm_network_interface" "subred1" {
-  name                = "${var.group}-nic"
+  name                = "${var.group}-nic1"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   depends_on = [
@@ -215,8 +220,12 @@ resource "azurerm_network_interface" "subred1" {
   }
 }
 
-resource "azurerm_virtual_machine" "main" {
-  name                  = "${var.group}-vm"
+data "template_file" "linux-vm-cloud-init" {
+  template = file("azure-user-data.sh")
+}
+
+resource "azurerm_virtual_machine" "vm1" {
+  name                  = "${var.group}-vm1"
   location              = azurerm_resource_group.main.location
   resource_group_name   = azurerm_resource_group.main.name
   network_interface_ids = [azurerm_network_interface.subred1.id]
@@ -224,11 +233,11 @@ resource "azurerm_virtual_machine" "main" {
   storage_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
-    sku       = "19_04-lts-gen2"
+    sku       = "19_10-daily-gen2"
     version   = "latest"
   }
   storage_os_disk {
-    name              = "${var.group}vm"
+    name              = "${var.group}vm1"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
@@ -243,6 +252,118 @@ resource "azurerm_virtual_machine" "main" {
  os_profile {
    computer_name = "${var.group}"
    admin_username = "iusr"
+    custom_data = base64encode(data.template_file.linux-vm-cloud-init.rendered)
+ }
+
+}
+
+//_____________________________________________________________________________________
+//VM2
+//_____________________________________________________________________________________
+
+resource "azurerm_network_interface" "subred2" {
+  name                = "${var.group}-nic2"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  depends_on = [
+    azurerm_public_ip.nat1
+  ]
+  ip_configuration {
+    name                          = "main"
+    subnet_id                     = azurerm_subnet.subred2.id
+    private_ip_address_allocation = "Dynamic"
+    //public_ip_address_id = azurerm_public_ip.nat1.id
+  }
+}
+
+# data "template_file" "linux-vm-cloud-init" {
+#   template = file("azure-user-data.sh")
+# }
+
+resource "azurerm_virtual_machine" "vm2" {
+  name                  = "${var.group}-vm2"
+  location              = azurerm_resource_group.main.location
+  resource_group_name   = azurerm_resource_group.main.name
+  network_interface_ids = [azurerm_network_interface.subred2.id]
+  vm_size               = "Standard_B1s"
+  storage_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "19_10-daily-gen2"
+    version   = "latest"
+  }
+  storage_os_disk {
+    name              = "${var.group}vm2"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+  os_profile_linux_config {
+    disable_password_authentication = true
+    ssh_keys {
+      key_data = file("./ssh/id_rsa.pub") 
+      path = "/home/iusr/.ssh/authorized_keys"
+    }
+  }
+ os_profile {
+   computer_name = "${var.group}"
+   admin_username = "iusr"
+    custom_data = base64encode(data.template_file.linux-vm-cloud-init.rendered)
+ }
+
+}
+//_____________________________________________________________________________________
+//VM3
+//_____________________________________________________________________________________
+
+resource "azurerm_network_interface" "subred3" {
+  name                = "${var.group}-nic3"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  depends_on = [
+    azurerm_public_ip.nat1
+  ]
+  ip_configuration {
+    name                          = "main"
+    subnet_id                     = azurerm_subnet.subred3.id
+    private_ip_address_allocation = "Dynamic"
+    //public_ip_address_id = azurerm_public_ip.nat1.id
+  }
+}
+
+# data "template_file" "linux-vm-cloud-init" {
+#   template = file("azure-user-data.sh")
+# }
+
+resource "azurerm_virtual_machine" "vm3" {
+  name                  = "${var.group}-vm3"
+  location              = azurerm_resource_group.main.location
+  resource_group_name   = azurerm_resource_group.main.name
+  network_interface_ids = [azurerm_network_interface.subred3.id]
+  vm_size               = "Standard_B1s"
+  storage_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "19_10-daily-gen2"
+    version   = "latest"
+  }
+  storage_os_disk {
+    name              = "${var.group}vm3"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+  os_profile_linux_config {
+    disable_password_authentication = true
+    ssh_keys {
+      key_data = file("./ssh/id_rsa.pub") 
+      path = "/home/iusr/.ssh/authorized_keys"
+    }
+  }
+ os_profile {
+   computer_name = "${var.group}"
+   admin_username = "iusr"
+    custom_data = base64encode(data.template_file.linux-vm-cloud-init.rendered)
  }
 
 }
