@@ -195,7 +195,54 @@ resource "azurerm_route_table" "subred1" {
   }
 }
 
-resource "azurerm_subnet_route_table_association" "example" {
+resource "azurerm_subnet_route_table_association" "subred1" {
   subnet_id      = azurerm_subnet.subred1.id
   route_table_id = azurerm_route_table.subred1.id
+}
+
+resource "azurerm_network_interface" "subred1" {
+  name                = "${var.group}-nic"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  depends_on = [
+    azurerm_public_ip.nat1
+  ]
+  ip_configuration {
+    name                          = "main"
+    subnet_id                     = azurerm_subnet.subred1.id
+    private_ip_address_allocation = "Dynamic"
+    //public_ip_address_id = azurerm_public_ip.nat1.id
+  }
+}
+
+resource "azurerm_virtual_machine" "main" {
+  name                  = "${var.group}-vm"
+  location              = azurerm_resource_group.main.location
+  resource_group_name   = azurerm_resource_group.main.name
+  network_interface_ids = [azurerm_network_interface.subred1.id]
+  vm_size               = "Standard_B1s"
+  storage_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "19_04-lts-gen2"
+    version   = "latest"
+  }
+  storage_os_disk {
+    name              = "${var.group}vm"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+  os_profile_linux_config {
+    disable_password_authentication = true
+    ssh_keys {
+      key_data = file("./ssh/id_rsa.pub") 
+      path = "/home/iusr/.ssh/authorized_keys"
+    }
+  }
+ os_profile {
+   computer_name = "${var.group}"
+   admin_username = "iusr"
+ }
+
 }
