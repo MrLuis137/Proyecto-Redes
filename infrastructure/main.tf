@@ -372,118 +372,116 @@ resource "azurerm_virtual_machine" "vm3" {
 //                                Firewall
 //_______________________________________________________________________________
 
-resource "azurerm_firewall_network_rule_collection" "firewall" {
-  name                = "firewall"
+
+
+resource "azurerm_network_security_group" "firewall" {
+  name                = "main-sg"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
-  priority            = 100
-  
 
-  //in rules
-  rule {
-    name                     = "SSH_IN_TCP_22"
-    description              = "Allow inbound SSH traffic in port 22"
-    source_addresses         = ["*"]
-    destination_ports        = ["22"]
-    destination_addresses    = ["*"]
-    protocol                 = "TCP"
-    access                   = "Allow"
-    direction                = "Inbound"
-    priority                 = 100
-  }
-  
-  rule {
-    name                     = "HTTP_IN_TCP_80"
-    description              = "Allow inbound HTTP traffic in port 80"
-    source_addresses         = ["*"]
-    destination_ports        = ["80"]
-    destination_addresses    = ["*"]
-    protocol                 = "TCP"
-    access                   = "Allow"
-    direction                = "Inbound"
-    priority                 = 101
-  }
-  
-  rule {
-    name                     = "HTTPS_IN_TCP_443"
-    description              = "Allow inbound HTTPS traffic in port 443"
-    source_addresses         = ["*"]
-    destination_ports        = ["443"]
-    destination_addresses    = ["*"]
-    protocol                 = "TCP"
-    access                   = "Allow"
-    direction                = "Inbound"
-    priority                 = 102
+  security_rule {
+    name                       = "OutboundUDP"
+    priority                   = 100
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Udp"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   }
 
-  //out rules
+  security_rule {
+    name                       = "Outbound443"
+    priority                   = 101
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
 
-  rule {
-    name                     = "SSH_OUT_TCP_22"
-    description              = "Allow outbound SSH traffic in port 22"
-    source_addresses         = ["*"]
-    destination_ports        = ["22"]
-    destination_addresses    = ["*"]
-    protocol                 = "TCP"
-    access                   = "Allow"
-    direction                = "Outbound"
-    priority                 = 103
+  security_rule {
+    name                       = "Outbound80"
+    priority                   = 102
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   }
+
+  security_rule {
+    name                       = "Outbound22"
+    priority                   = 106
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Inbound443"
+    priority                   = 104
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Inbound80"
+    priority                   = 105
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Inbound22"
+    priority                   = 107
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
   
 
-  rule {
-    name                     = "HTTP_OUT_TCP_80"
-    description              = "Allow outbound HTTP trafficin port 80"
-    source_addresses         = ["*"]
-    destination_ports        = ["80"]
-    destination_addresses    = ["*"]
-    protocol                 = "TCP"
-    access                   = "Allow"
-    direction                = "Outbound"
-    priority                 = 104
-  }
-  
-  rule {
-    name                     = "HTTPS_OUT_TCP_443"
-    description              = "Allow outbound HTTPS traffic in port 443"
-    source_addresses         = ["*"]
-    destination_ports        = ["443"]
-    destination_addresses    = ["*"]
-    protocol                 = "TCP"
-    access                   = "Allow"
-    direction                = "Outbound"
-    priority                 = 105
-  }
-  
-  rule {
-    name                     = "Allow_udp_out"
-    description              = "Allow outbound UDP traffic"
-    source_addresses         = ["*"]
-    destination_ports        = ["*"]
-    destination_addresses    = ["*"]
-    protocol                 = "UDP"
-    access                   = "Allow"
-    direction                = "Outbound"
-    priority                 = 106
-  }
 }
-
 
 //Se asocia el firewall con las redes
 
 resource "azurerm_subnet_network_security_group_association" "subnet1-firewall" {
   subnet_id                 = azurerm_subnet.subred1.id
-  network_security_group_id = azurerm_firewall_network_rule_collection.firewall.id
+  network_security_group_id = azurerm_network_security_group.firewall.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "subnet2-firewall" {
   subnet_id                 = azurerm_subnet.subred1.id
-  network_security_group_id = azurerm_firewall_network_rule_collection.firewall.id
+  network_security_group_id = azurerm_network_security_group.firewall.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "subnet3-firewall" {
   subnet_id                 = azurerm_subnet.subred1.id
-  network_security_group_id = azurerm_firewall_network_rule_collection.firewall.id
+  network_security_group_id = azurerm_network_security_group.firewall.id
 }
 
 // ______________________________________________________________________________
