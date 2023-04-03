@@ -486,4 +486,52 @@ resource "azurerm_subnet_network_security_group_association" "subnet3-firewall" 
   network_security_group_id = azurerm_firewall_network_rule_collection.firewall.id
 }
 
+// ______________________________________________________________________________
+//                                load balancer
+//_______________________________________________________________________________
 
+// https://learn.microsoft.com/en-us/azure/load-balancer/quickstart-load-balancer-standard-public-powershell
+
+// should to create a new one because 
+// this load balancer and the NAT gateway can not share a public ip
+resource "azurerm_public_ip" "publicIPForLoadBalancer" {
+  name                = "${var.group}-ip-lb"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  allocation_method   = "Static" 
+  sku                 = "Standard"
+  zones               = ["1"]
+}
+
+resource "azurerm_lb" "myLoadBalancer" {
+  name                  = "${var.group}-myLoadBalancer"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku                 = "Standard"
+
+  frontend_ip_configuration {
+    name                 = "PublicIPAddress"
+    public_ip_address_id = azurerm_public_ip.publicIPForLoadBalancer.id 
+  }
+}
+
+resource "azurerm_lb_backend_address_pool" "myLoadBalancerBackendAddress" {
+  loadbalancer_id = azurerm_lb.myLoadBalancer.id
+  name            = "${var.group}-myLoadBalancerBackendAddress"
+}
+
+resource "azurerm_lb_probe" "example" {
+  loadbalancer_id = azurerm_lb.myLoadBalancer.id
+  name            = "${var.group}-myLoadBalancerssh-running-probe"
+  port            = 22
+}
+
+// here i reference to the vm, but not sure
+resource "azurerm_lb_rule" "example" {
+  loadbalancer_id                = azurerm_lb.myLoadBalancer.id
+  name                           = "${var.group}-myLoadBalancerssh-LBRule"
+  protocol                       = "Tcp"
+  frontend_port                  = 3389
+  backend_port                   = 3389
+  frontend_ip_configuration_name = "PublicIPAddress"
+}
