@@ -374,6 +374,7 @@ resource "azurerm_virtual_machine" "vm3" {
 
 
 
+
 resource "azurerm_network_security_group" "firewall" {
   name                = "main-sg"
   location            = azurerm_resource_group.main.location
@@ -518,18 +519,19 @@ resource "azurerm_lb_backend_address_pool" "myLoadBalancerBackendAddress" {
   name            = "${var.group}-myLoadBalancerBackendAddress"
 }
 
-resource "azurerm_lb_probe" "example" {
-  loadbalancer_id = azurerm_lb.myLoadBalancer.id
-  name            = "${var.group}-myLoadBalancerssh-running-probe"
-  port            = 22
+resource "azurerm_network_interface_backend_address_pool_association" "interfaceBackedLoadBalancer1" {
+  network_interface_id    = azurerm_network_interface.subred1.id
+  ip_configuration_name   = "main"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.myLoadBalancerBackendAddress.id
+}
+resource "azurerm_network_interface_backend_address_pool_association" "interfaceBackedLoadBalancer2" {
+  network_interface_id    = azurerm_network_interface.subred2.id
+  ip_configuration_name   = "main"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.myLoadBalancerBackendAddress.id
+}
+resource "azurerm_network_interface_backend_address_pool_association" "interfaceBackedLoadBalancer3" {
+  network_interface_id    = azurerm_network_interface.subred3.id
+  ip_configuration_name   = "main"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.myLoadBalancerBackendAddress.id
 }
 
-// here i reference to the vm, but not sure
-resource "azurerm_lb_rule" "example" {
-  loadbalancer_id                = azurerm_lb.myLoadBalancer.id
-  name                           = "${var.group}-myLoadBalancerssh-LBRule"
-  protocol                       = "Tcp"
-  frontend_port                  = 3389
-  backend_port                   = 3389
-  frontend_ip_configuration_name = "PublicIPAddress"
-}
