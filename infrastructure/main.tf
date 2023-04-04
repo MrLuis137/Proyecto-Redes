@@ -372,7 +372,7 @@ resource "azurerm_virtual_machine" "vm3" {
 //                                Firewall
 //_______________________________________________________________________________
 
-
+/*
 
 
 resource "azurerm_network_security_group" "firewall" {
@@ -483,7 +483,7 @@ resource "azurerm_subnet_network_security_group_association" "subnet2-firewall" 
 resource "azurerm_subnet_network_security_group_association" "subnet3-firewall" {
   subnet_id                 = azurerm_subnet.subred1.id
   network_security_group_id = azurerm_network_security_group.firewall.id
-}
+}*/
 
 // ______________________________________________________________________________
 //                                load balancer
