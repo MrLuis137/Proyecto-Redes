@@ -145,8 +145,13 @@ resource "azurerm_public_ip" "nat1" {
   name                = "${var.group}-ip"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
-  allocation_method   = "Static" 
-  sku                 = "Standard"
+  #allocation_method   = "Dynamic"
+
+  tags = {
+    environment = "dev"
+  }
+  allocation_method   = "Dynamic" 
+  sku                 = "Basic"
   zones               = ["1"]
 }
 
@@ -216,7 +221,7 @@ resource "azurerm_network_interface" "subred1" {
     name                          = "main"
     subnet_id                     = azurerm_subnet.subred1.id
     private_ip_address_allocation = "Dynamic"
-    //public_ip_address_id = azurerm_public_ip.nat1.id
+    public_ip_address_id = azurerm_public_ip.nat1.id
   }
 }
 
@@ -252,10 +257,35 @@ resource "azurerm_virtual_machine" "vm1" {
  os_profile {
    computer_name = "${var.group}"
    admin_username = "iusr"
-    custom_data = base64encode(data.template_file.linux-vm-cloud-init.rendered)
+   custom_data = base64encode(data.template_file.linux-vm-cloud-init.rendered)
+   admin_password = "123456" # Contraseña para la cuenta de administrador de la máquina virtual
  }
 
+
+  /*provisioner "remote-exec" {
+
+    connection {
+      type        = "ssh"
+      host        = azurerm_network_interface.subred1.ip_configuration[3] # Dirección IP pública de la máquina virtual
+      user        = "iusr" # Nombre de usuario para la conexión SSH, obtenido del atributo os_profile.admin_username de la máquina virtual
+      password    = "123456" # Contraseña para la conexión SSH, obtenida del atributo os_profile.admin_password de la máquina virtual
+      
+    }
+
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get install -y curl",
+      "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -P chefdk",
+      "echo 'Copying chef-repo'",
+      "sudo cp -R /D:/Proyecto-Redes/infrastructure/chef-repo /etc/chef/chef-repo",  # Ruta local de la carpeta chef-repo en tu máquina local
+      "sudo chef-solo -c /etc/chef/chef-repo/solo.rb -j /etc/chef/chef-repo/node.json"
+    ]
+  }*/
+
+
 }
+
+
 
 //_____________________________________________________________________________________
 //VM2
@@ -327,7 +357,7 @@ resource "azurerm_network_interface" "subred3" {
     name                          = "main"
     subnet_id                     = azurerm_subnet.subred3.id
     private_ip_address_allocation = "Dynamic"
-    //public_ip_address_id = azurerm_public_ip.nat1.id
+    public_ip_address_id = ""//azurerm_public_ip.nat1.id
   }
 }
 
