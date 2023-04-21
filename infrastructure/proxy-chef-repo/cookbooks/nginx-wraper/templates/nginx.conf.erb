@@ -1,0 +1,26 @@
+user nobody nogroup;  ## Default: nobody
+worker_processes  5;  ## Default: 1
+worker_rlimit_nofile 8192;
+
+events {
+  worker_connections  4096;  ## Default: 1024
+}
+
+http {
+    # Configuration specific to HTTP and affecting all virtual servers
+
+  index    index.html index.htm index.php;
+
+
+    server {
+        # configuration of HTTP virtual server 1
+        listen 80;
+        location /server1 {
+            proxy_pass http://localhost:81/;
+        }
+        location /server2 {
+                proxy_pass http://localhost:82/;
+        }
+    }
+
+}
