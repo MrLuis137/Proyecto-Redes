@@ -1,142 +1,27 @@
 {
   "run_list": [
-    "recipe[apache2]",
-    "recipe[bind9]"
+    "recipe[bind::default]"
   ],
-  "bind9": {
-    "zones": [
-      {
-        "id": "asimov.io",
-        "domain": "asimov.io",
-        "type": "master",
-        "allow_transfer": [],
-        "zone_info": {
-          "global_ttl": 3000,
-          "soa": "ns.asimov.io.",
-          //"contact": "user.asimov.io.",
-          "serial": 2011091402,
-          "nameserver": [
-             "ns.asimov.io"
-            // "ns.example.net",
-            // "ns2.example.org.",
-            // "ns3.example.de."
-          ],
-          "mail_exchange": [], //no se definen registros de recursos de intercambio de correo para esta zona.
-          "records": [
-            {
-              "name": "*.asimov.io",
-              "type": "A",  //Asocia una dirección IP IPv4 a un nombre de dominio.
-              "ip": "IP_DEL_SERVIDOR_APACHE1"  //cambiar por el ip de la vm
-            },
-            {
-              "name": "fiodor.asimov.io",
-              "type": "A",
-              "ip": "IP_DEL_SERVIDOR_APACHE2"   //cambiar por el ip de la vm
-            }
-          ]
-        }
-      },
-      {
-        "id": "dostoievski.io",
-        "domain": "dostoievski.io",
-        "type": "master",
-        "allow_transfer": [],
-        "zone_info": {
-          "global_ttl": 3000,
-          "soa": "ns.dostoievski.io.",
-          "contact": "user.dostoievski.io.",
-          "serial": 2011091402,
-          "nameserver": [
-            "ns.dostoievski.io",
-           // "ns.example.net",
-            //"ns2.example.org.",
-            //"ns3.example.de."
-          ],
-          "mail_exchange": [],
-          "records": [
-            {
-              "name": "*.dostoievski.io",
-              "type": "A",
-              "ip": "IP_DEL_SERVIDOR_APACHE2"   //cambiar por el ip de la vm
-            },
-            {
-              "name": "isaac.dostoievski.io",
-              "type": "A",
-              "ip": "IP_DEL_SERVIDOR_APACHE1"    //cambiar por el ip de la vm
-            }
-          ]
-        }
-      },
-      {
-        "id": "google.com",
-        "domain": "google.com",
-        "type": "master",
-        "allow_transfer": [],
-        "zone_info": {
-          "global_ttl": 3000,
-          "soa": "ns.google.com.",
-          "contact": "user.google.com.",
-          "serial": 2011091402,
-          "nameserver": [
-            "ns.google.com",
-          //  "ns.example.net",
-           // "ns2.example.org.",
-            //"ns3.example.de."
-          ],
-          "mail_exchange": [],
-          "records": [
-            {
-              "name": "www.google.com",
-              "type": "A",
-              "ip": "IP_DEL_SERVIDOR_APACHE1"   //cambiar por el ip de la vm
-            },
-            {
-              "name": "www.google.com",
-              "type": "A",
-              "ip": "IP_DEL_SERVIDOR_APACHE2"   //cambiar por el ip de la vm
-            }
-          ]
-        }
-      }
-    ],
-    "forwarders": [
-      "8.8.8.8",
-      "8.8.8.9"
-    ]
-  },
-  "apache2": {
-    "port": 80,
-    "sites": [
-        {
-          "name": "www.google.com",
-          "server_name": "www.google.com",
-          "port": 80,
-          "document_root": "DOCUMENT_ROOT_DEL_SERVIDOR_APACHE1"    //cambiar por el ruta en la vm
-        },
-        {
-            "name": "*.asimov.io",
-            "server_name": "*.asimov.io",
-            "port": 80,
-            "document_root": "DOCUMENT_ROOT_DEL_SERVIDOR_APACHE1"   //cambiar por el ruta en la vm
-          },
-          {
-            "name": "*.dostoievski.io",
-            "server_name": "*.dostoievski.io",
-            "port": 80,
-            "document_root": "DOCUMENT_ROOT_DEL_SERVIDOR_APACHE2"   //cambiar por el ruta en la vm
-          },
-          {
-            "name": "fiodor.asimov.io",
-            "server_name": "fiodor.asimov.io",
-            "port": 80,
-            "document_root": "DOCUMENT_ROOT_DEL_SERVIDOR_APACHE2"   //cambiar por el ruta en la vm
-          },
-          {
-            "name": "isaac.dostoievski.io",
-            "server_name": "isaac.dostoievski.io",
-            "port": 80,
-            "document_root": "DOCUMENT_ROOT_DEL_SERVIDOR_APACHE1"   //cambiar por el ruta en la vm
-          }
-        ]
+  "bind": {
+    "bind_primary_zone": {
+
+      "zone_name":"asimov.io",
+      "source_file":"asimov.io"
+
+    },
+    "bind_primary_zone": {
+
+      "zone_name":"dostoievski.io",
+      "source_file":"dostoievski.io"
+
+    },
+    "bind_primary_zone": {
+
+      "zone_name":"google.com",
+      "source_file":"google.com"
+
+    },
+    "bind_forward_zone": { "forwarders": [  "8.8.8.8",    "8.8.8.9"]}
+    
   }
 }

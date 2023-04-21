@@ -1,10 +1,10 @@
 
 
 output "rg_name" {
-  value = azurerm_resource_group.main.name
+  value = azurerm_resource_group.dns.name
 }
 
 output "rg_id" {
-  value = azurerm_resource_group.main.id
+  value = azurerm_resource_group.dns.id
   }
 
