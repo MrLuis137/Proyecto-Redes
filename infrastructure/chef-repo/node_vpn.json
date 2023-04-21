@@ -1,0 +1,22 @@
+{
+  "run_list":[
+      "recipe[openvpn::enable_ip_forwarding]",
+      "recipe[openvpn::server]",
+      "recipe[openvpn::easy_rsa]",
+      "recipe[openvpn::users]"
+  ],
+  "openvpn":{
+      "gateway": "<<ip-vm>>",
+      "push_options": {
+          "dhcp-option":["DNS 8.8.8.8"],
+          "redirect-gateway":["autolocal"]
+      },
+      "config": {
+          "port":443,
+          "proto":"tcp"
+      },
+      "key": {
+          "ca_expire": 3000
+      }
+  }
+}
