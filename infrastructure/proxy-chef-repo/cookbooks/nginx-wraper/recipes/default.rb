@@ -37,6 +37,8 @@ script 'extract_module' do
   </VirtualHost>
   # vim: syntax=apache ts=4 sw=4 sts=4 sr noet
   " | sudo tee /etc/apache2/sites-available/server1.conf
+  sudo mkdir /var/www/server1
+  sudo mkdir /var/www/server2
   sudo mkdir /var/www/server1/public_html
   sudo mkdir /var/www/server2/public_html
   echo "
