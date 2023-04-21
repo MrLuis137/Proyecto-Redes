@@ -565,3 +565,90 @@ resource "azurerm_network_interface_backend_address_pool_association" "interface
   backend_address_pool_id = azurerm_lb_backend_address_pool.myLoadBalancerBackendAddress.id
 }
 
+
+
+//---------------------------------------------------------------------
+// PROXY REVERSO
+//---------------------------------------------------------------------
+
+//resource "azurerm_resource_group" "reverse_proxy" {
+//  name     = "ic7602-reverse-proxy"
+//  location = var.location["name"]
+//}
+//
+//resource "azurerm_virtual_network" "reverse_proxy" {
+//  name                = "reverse-proxy-network"
+//  address_space       = ["10.0.0.0/16"]
+//  location            = azurerm_resource_group.reverse_proxy.location
+//  resource_group_name = azurerm_resource_group.reverse_proxy.name
+//}
+//
+//resource "azurerm_subnet" "reverse_proxy" {
+//  name                 = "main"
+//  resource_group_name  = azurerm_resource_group.reverse_proxy.name
+//  virtual_network_name = azurerm_virtual_network.reverse_proxy.name
+//  address_prefixes     = ["10.0.2.0/24"]
+//}
+//
+//resource "azurerm_public_ip" "reverse_proxy" {
+//  name                = "reverse-proxy-ip"
+//  resource_group_name = azurerm_resource_group.reverse_proxy.name
+//  location            = azurerm_resource_group.reverse_proxy.location
+//  allocation_method   = "Static"
+//}
+//
+//resource "azurerm_network_interface" "reverse_proxy" {
+//  name                = "reverse-proxy-nic"
+//  location            = azurerm_resource_group.reverse_proxy.location
+//  resource_group_name = azurerm_resource_group.reverse_proxy.name
+//  depends_on = [
+//    azurerm_public_ip.reverse_proxy
+//  ]
+//  ip_configuration {
+//    name                          = "main"
+//    subnet_id                     = azurerm_subnet.reverse_proxy.id
+//    private_ip_address_allocation = "Dynamic"
+//    public_ip_address_id = azurerm_public_ip.reverse_proxy.id
+//  }
+//}
+//
+//data "template_file" "proxy-vm-cloud-init" {
+//   template = file("chef-reverse-proxy.sh")
+// }
+//
+//resource "azurerm_virtual_machine" "reverse_proxy" {
+//  name                  = "reverse-proxyvm"
+//  location              = azurerm_resource_group.reverse_proxy.location
+//  resource_group_name   = azurerm_resource_group.reverse_proxy.name
+//  network_interface_ids = [azurerm_network_interface.reverse_proxy.id]
+//  vm_size               = "Standard_b2s"
+//  storage_image_reference {
+//    publisher = "Canonical"
+//    offer     = "UbuntuServer"
+//    sku       = "18.04-LTS"
+//    version   = "latest"
+//  }
+//  storage_os_disk {
+//    name              = "reverse-proxyvm"
+//    caching           = "ReadWrite"
+//    create_option     = "FromImage"
+//    managed_disk_type = "Standard_LRS"
+//  }
+//  os_profile_linux_config {
+//    disable_password_authentication = true
+//    ssh_keys {
+//      key_data = file("./ssh/id_rsa.pub") 
+//      path = "/home/iusr/.ssh/authorized_keys"
+//    }
+//  }
+//  os_profile {
+//    computer_name = "reverse-proxy-test"
+//    admin_username = "iusr"
+//    custom_data = base64encode(data.template_file.proxy-vm-cloud-init.rendered)
+//  }
+//}
+
+//---------------------------------------------------------------------
+// PROXY REVERSO
+//---------------------------------------------------------------------
+
