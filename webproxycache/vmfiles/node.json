@@ -1,0 +1,9 @@
+{
+	"run_list": ["recipe[squid::default]"],
+	"squid": {
+	  "cache_mem": "256",
+	  "port": "3128",
+	  "http_access_deny_all": "false"
+	}
+	
+}
