@@ -9,5 +9,5 @@ $TTL 3H
         IN      NS      ns.google.com.
 
 ns              IN      A       52.149.155.47
-www.google.com  IN      A       4.227.244.216
-www.google.com  IN      A       172.173.178.141
+www  IN      A       4.227.244.216
+www  IN      A       172.173.178.141
