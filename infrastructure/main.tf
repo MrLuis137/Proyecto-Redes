@@ -1240,7 +1240,7 @@ resource "azurerm_network_interface" "dns" {
   } 
 } 
  
-data "template_file" "proxy-vm-cloud-init" { 
+data "template_file" "dns-vm-cloud-init" { 
    template = file("chef-dns.sh") 
  } 
  
@@ -1249,7 +1249,7 @@ resource "azurerm_virtual_machine" "dns" {
   location              = azurerm_resource_group.main.location 
   resource_group_name   = azurerm_resource_group.main.name 
   network_interface_ids = [azurerm_network_interface.dns.id] 
-  vm_size               = "Standard_b2s" 
+  vm_size               = "Standard_B1s" 
   storage_image_reference { 
     publisher = "Canonical" 
     offer     = "UbuntuServer" 
@@ -1272,11 +1272,147 @@ resource "azurerm_virtual_machine" "dns" {
   os_profile { 
     computer_name = "dns-test" 
     admin_username = "iusr" 
-    custom_data = base64encode(data.template_file.proxy-vm-cloud-init.rendered) 
+    custom_data = base64encode(data.template_file.dns-vm-cloud-init.rendered) 
   } 
 } 
+
+
  
 //--------------------------------------------------------------------- 
 // DNS
 //--------------------------------------------------------------------- 
+
+
+//--------------------------------------------------------------------
+//APACHE 1
+//--------------------------------------------------------------------
+
+ 
+resource "azurerm_public_ip" "apache1" { 
+  name                = "apache1-ip" 
+  resource_group_name = azurerm_resource_group.main.name 
+  location            = azurerm_resource_group.main.location 
+  allocation_method   = "Static" 
+} 
+ 
+resource "azurerm_network_interface" "apache1" { 
+  name                = "apache1-nic" 
+  location            = azurerm_resource_group.main.location 
+  resource_group_name = azurerm_resource_group.main.name 
+  depends_on = [ 
+    azurerm_public_ip.apache1 
+  ] 
+  ip_configuration { 
+    name                          = "main" 
+    subnet_id                     = azurerm_subnet.dns.id 
+    private_ip_address_allocation = "Dynamic" 
+    public_ip_address_id = azurerm_public_ip.apache1.id 
+  } 
+} 
+ 
+data "template_file" "apache-vm-cloud-init" { 
+   template = file("chef-apache.sh") 
+ } 
+ 
+resource "azurerm_virtual_machine" "apache1" { 
+  name                  = "apache1-vm" 
+  location              = azurerm_resource_group.main.location 
+  resource_group_name   = azurerm_resource_group.main.name 
+  network_interface_ids = [azurerm_network_interface.apache1.id] 
+  vm_size               = "Standard_B1s" 
+  storage_image_reference { 
+    publisher = "Canonical" 
+    offer     = "UbuntuServer" 
+    sku       = "18.04-LTS" 
+    version   = "latest" 
+  } 
+  storage_os_disk { 
+    name              = "apache1-disk" 
+    caching           = "ReadWrite" 
+    create_option     = "FromImage" 
+    managed_disk_type = "Standard_LRS" 
+  } 
+  os_profile_linux_config { 
+    disable_password_authentication = true 
+    ssh_keys { 
+      key_data = file("./ssh/id_rsa.pub")  
+      path = "/home/iusr/.ssh/authorized_keys" 
+    } 
+  } 
+  os_profile { 
+    computer_name = "apache1-test" 
+    admin_username = "iusr" 
+    custom_data = base64encode(data.template_file.apache-vm-cloud-init.rendered) 
+  } 
+} 
+//--------------------------------------------------------------------
+//APACHE 1
+//--------------------------------------------------------------------
+
+
+//--------------------------------------------------------------------
+//APACHE 2
+//--------------------------------------------------------------------
+
+ 
+resource "azurerm_public_ip" "apache2" { 
+  name                = "apache2-ip" 
+  resource_group_name = azurerm_resource_group.main.name 
+  location            = azurerm_resource_group.main.location 
+  allocation_method   = "Static" 
+} 
+ 
+resource "azurerm_network_interface" "apache2" { 
+  name                = "apache2-nic" 
+  location            = azurerm_resource_group.main.location 
+  resource_group_name = azurerm_resource_group.main.name 
+  depends_on = [ 
+    azurerm_public_ip.apache2 
+  ] 
+  ip_configuration { 
+    name                          = "main" 
+    subnet_id                     = azurerm_subnet.dns.id 
+    private_ip_address_allocation = "Dynamic" 
+    public_ip_address_id = azurerm_public_ip.apache2.id 
+  } 
+} 
+ 
+# data "template_file" "proxy-vm-cloud-init" { 
+#    template = file("chef-apache.sh") 
+#  } 
+ 
+resource "azurerm_virtual_machine" "apache2" { 
+  name                  = "apache2-vm" 
+  location              = azurerm_resource_group.main.location 
+  resource_group_name   = azurerm_resource_group.main.name 
+  network_interface_ids = [azurerm_network_interface.apache2.id] 
+  vm_size               = "Standard_B1s" 
+  storage_image_reference { 
+    publisher = "Canonical" 
+    offer     = "UbuntuServer" 
+    sku       = "18.04-LTS" 
+    version   = "latest" 
+  } 
+  storage_os_disk { 
+    name              = "apache2-disk" 
+    caching           = "ReadWrite" 
+    create_option     = "FromImage" 
+    managed_disk_type = "Standard_LRS" 
+  } 
+  os_profile_linux_config { 
+    disable_password_authentication = true 
+    ssh_keys { 
+      key_data = file("./ssh/id_rsa.pub")  
+      path = "/home/iusr/.ssh/authorized_keys" 
+    } 
+  } 
+  os_profile { 
+    computer_name = "apache2-test" 
+    admin_username = "iusr" 
+    custom_data = base64encode(data.template_file.apache-vm-cloud-init.rendered) 
+  } 
+} 
+//--------------------------------------------------------------------
+//APACHE 2
+//--------------------------------------------------------------------
  

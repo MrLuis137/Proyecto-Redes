@@ -1,10 +1,13 @@
-$TTL 1D
-@       IN SOA  @ rname.invalid. (
-                                        0       ; serial
-                                        1D      ; refresh
-                                        1H      ; retry
-                                        1W      ; expire
-                                        3H )    ; minimum
-        NS      @
-        A       127.0.0.1
-        AAAA    ::1
+$TTL 3H
+@       IN      SOA     ns.dostoievski.io. admin.dostoievski.io. (
+                        2023042201      ; serial
+                        1D              ; refresh
+                        1H             ; retry
+                        1W              ; expiry
+                        3H              ; minimum
+                        )
+        IN      NS      ns.dostoievski.io.
+
+ns      IN      A       52.149.155.47
+isaac   IN      A       172.173.178.141
+*       IN      A       4.227.244.216

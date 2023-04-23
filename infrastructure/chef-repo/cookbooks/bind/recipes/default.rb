@@ -24,14 +24,14 @@ end
 
 bind_config 'default' do
   options [
-    'allow-query { trusted-nets; }',
+    'allow-query { any; }',
     'recursion yes',
-    'allow-recursion { trusted-nets; }',
+    'allow-recursion { any; }',
   ]
 end
 
-bind_acl 'trusted-nets' do
-  entries %w(
-    localhost
-    localnets)
-end
+# bind_acl 'trusted-nets' do
+#   entries %w(
+#     localhost
+#     localnets)
+# end

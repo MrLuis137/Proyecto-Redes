@@ -104,6 +104,11 @@ include "<%= "#{@sysconfdir}/#{file}" %>";
   }
 -%>
 
+forwarders {
+  8.8.8.8; 
+  8.8.8.9; 
+};
+
 zone "." IN {
   type hint;
   file "named.ca";

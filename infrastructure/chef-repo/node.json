@@ -3,25 +3,54 @@
     "recipe[bind::default]"
   ],
   "bind": {
-    "bind_primary_zone": {
-
-      "zone_name":"asimov.io",
-      "source_file":"asimov.io"
-
-    },
-    "bind_primary_zone": {
-
-      "zone_name":"dostoievski.io",
-      "source_file":"dostoievski.io"
-
-    },
-    "bind_primary_zone": {
-
-      "zone_name":"google.com",
-      "source_file":"google.com"
-
-    },
-    "bind_forward_zone": { "forwarders": [  "8.8.8.8",    "8.8.8.9"]}
     
+    "zones": [
+        {
+            "type": "master",
+            "zone_name": "asimov.io",
+            "file_name": "asimov.io.zone",
+            "masters": ["52.149.155.47"]
+        },
+        {
+            "type": "master",
+            "zone_name": "dostoievski.io",
+            "file_name": "dostoievski.io.zone",
+            "masters": ["52.149.155.47"]
+        },
+        {
+            "type": "master",
+            "zone_name": "google.com",
+            "file_name": "google.com.zone",
+            "masters": ["52.149.155.47"]
+        }
+    ],
+    "forwarders": ["8.8.8.8", "8.8.8.9"],
+    "records": [
+        {
+            "name": "www.google.com",
+            "type": "A",
+            "values": ["172.173.178.141", "4.227.244.216"]
+        },
+        {
+            "name": "*.asimov.io",
+            "type": "A",
+            "value": "172.173.178.141"
+        },
+        {
+            "name": "*.dostoievski.io",
+            "type": "A",
+            "value": "4.227.244.216"
+        },
+        {
+            "name": "fiodor.asimov.io",
+            "type": "A",
+            "value": "4.227.244.216"
+        },
+        {
+            "name": "isaac.dostoievski.io",
+            "type": "A",
+            "value": "172.173.178.141"
+        }
+    ]
   }
 }
