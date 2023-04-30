@@ -5,6 +5,9 @@ output "instance_ip_addr" {
 }
 /**/
 
-//sudo chef-solo  -c solo.rb -j node.json   137.117.58.166
+//sudo chef-solo  -c solo.rb -j node.json   20.51.172.105
 // ". 30 50% 20160 override-expire ignore-no-store ignore-private"
 //chmod +x /tmp/install.sh
+
+//sudo tail -100 /var/log/squid/access.log
+//sudo du -s

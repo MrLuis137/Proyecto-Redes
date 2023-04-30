@@ -81,7 +81,7 @@ refresh_pattern     (Release|Package(.gz)*)$    0       20%     2880
 # refresh_pattern           \.iso$                      1440    20%     10080
 # refresh_pattern           \.$                 1440    20%     10080
 # refresh_pattern           .                           0       20%     4320
-refresh_pattern             .                   30      50%     20160 override-expire ignore-no-store ignore-private
+refresh_pattern             .                   5       50%     20160 override-expire ignore-no-store ignore-private
 hosts_file /etc/hosts
 maximum_object_size <%= node['squid']['max_obj_size'] %> <%= node['squid']['max_obj_size_unit'] %>
 <%- if node['squid']['enable_cache_dir'] %>

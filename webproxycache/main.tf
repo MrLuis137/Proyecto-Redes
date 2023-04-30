@@ -96,6 +96,7 @@ resource "azurerm_virtual_machine" "main" {
   provisioner "remote-exec" {
   inline = [
     "chmod +x /tmp/install.sh",
+    "sudo /tmp/install.sh",
   ]
   connection {
       type        = "ssh"
@@ -123,11 +124,10 @@ resource "azurerm_virtual_machine" "main" {
       key_data = file("./ssh/ubutu.pub") 
       path = "/home/iusr/.ssh/authorized_keys"
     }
-  }
+  } 
  os_profile {
    computer_name = "${var.group}"
    admin_username = "iusr"
-   custom_data = base64encode(data.template_file.linux-vm-cloud-init.rendered)
  }
 
 
