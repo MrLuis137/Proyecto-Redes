@@ -1,18 +1,6 @@
 #! /bin/bash
 
-
-
-echo "start script"
-cd ..
-
-echo "start terraform"
-terraform init
-echo "init done"
-
-echo "start apply"
-terraform apply --var-file=conf/group.tfvars -auto-approve
-echo "apply done"
-IP=$(terraform output -raw public_ip_address)
+IP="20.120.4.37"
 
 JSON_CONTENT='
 {
@@ -26,7 +14,7 @@ JSON_CONTENT='
         "gateway": $IP,
         "push_options": {
             "dhcp-option":["DNS 8.8.8.8"],
-            "redirect-gateway":["autolocal"]
+            "redire20.120.4.37ct-gateway":["autolocal"]
         },
         "config": {
             "port":443,
