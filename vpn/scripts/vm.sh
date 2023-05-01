@@ -1,9 +1,12 @@
 #! /bin/bash
 echo "insert ip : ";
 read IP;
-cd ../..
+cd ..
 
-ssh -t -i ./vpn/ssh/id_rsa iusr@$IP '
+ssh -t -i ./ssh/id_rsa iusr@$IP '
+echo "curent ip {$IP}"
+
+echo "starting configuration inside vm"
 
 if [[ ! -f /var/lib/apt/periodic/update-success-stamp ]] || \
    [[ $(find /var/lib/apt/periodic/update-success-stamp -mmin +60) ]]; then

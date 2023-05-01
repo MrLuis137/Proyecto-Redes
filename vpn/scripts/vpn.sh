@@ -1,53 +1,52 @@
 #! /bin/bash
 
-echo "**********************start script**********************"
+echo "start script"
 cd ..
 
-echo "**********************start terraform**********************"
+echo "start terraform"
 terraform init
-echo "**********************init done**********************"
+echo "init done"
 
-echo "**********************start apply**********************"
+echo "start apply"
 terraform apply --var-file=conf/group.tfvars -auto-approve
-echo "**********************apply done**********************"
+echo "apply done"
 IP=$(terraform output -raw public_ip_address)
 
-echo "**********************The value of your ip is: ${IP}**********************"
+echo "The value of your ip is: ${IP}"
 
 ssh -t -i ./ssh/id_rsa iusr@$IP '
+echo "curent ip {$IP}"
 
-echo "**********************curent ip {$IP}**********************"
-
-echo "**********************starting configuration inside vm**********************"
+echo "starting configuration inside vm"
 
 if [[ ! -f /var/lib/apt/periodic/update-success-stamp ]] || \
    [[ $(find /var/lib/apt/periodic/update-success-stamp -mmin +60) ]]; then
   sudo apt-get update
 fi
 
-echo "**********************installing chef workstation**********************";
+echo "installing chef workstation";
 if [ -f "./chef-workstation_21.10.640-1_amd64.deb" ]; then
-    echo "**********************File exists**********************"
+    echo "File exists"
 else
-    echo "**********************File does not**********************"
+    echo "File does not"
     wget https://packages.chef.io/files/stable/chef-workstation/21.10.640/ubuntu/20.04/chef-workstation_21.10.640-1_amd64.deb;
     sudo dpkg -i chef-workstation_21.10.640-1_amd64.deb;
 fi
 
 if command -v chef-solo &> /dev/null
 then
-    echo "**********************Chef is installed**********************"
+    echo "Chef is installed"
 else
-    echo "**********************Chef is not installed**********************"
+    echo "Chef is not installed"
     sudo dpkg -i chef-workstation_21.10.640-1_amd64.deb;
 fi
 
 
-echo "**********************downloading repo...**********************";
+echo "downloading repo...";
 if [ -d "./Proyecto-Redes" ]; then
-    echo "**********************Folder exists**********************"
+    echo "Folder exists"
 else
-    echo "**********************Folder does exists**********************"
+    echo "Folder does exists"
     git clone https://github.com/MrLuis137/Proyecto-Redes.git;
 fi
 
@@ -82,11 +81,11 @@ JSON_CONTENT="{
     }
 }"
 
-echo "**********************saving node.json**********************"
+echo "saving node.json"
 echo $JSON_CONTENT > node.json;
 cat node.json;
 
-echo "**********************saving solo.rb**********************"
+echo "saving solo.rb"
 echo "current_dir = File.expand_path(File.dirname(__FILE__))
 file_cache_path \"#{current_dir}\"
 cookbook_path \"#{current_dir}/cookbooks\"
@@ -115,7 +114,7 @@ echo "
 " > data_bags/users/$USER_NAME.json;
 cat data_bags/users/$USER_NAME.json;
 
-echo "**********************running chef-solo...**********************";
+echo "running chef-solo...";
 
 #if [ -f /lib/systemd/system/openvpn.service ]; then
     #echo "OpenVPN is installed."
@@ -124,7 +123,7 @@ echo "**********************running chef-solo...**********************";
     sudo chef-solo -c solo.rb -j node.json;
 #fi
 
-echo "**********************done chef-solo...**********************";
+echo "done chef-solo...";
 
 sudo cp /etc/openvpn/keys/vpn-prod-$USER_NAME.ovpn .;
 sed -E -i -e "/^(ca|cert|key)/d" vpn-prod-$USER_NAME.ovpn;
